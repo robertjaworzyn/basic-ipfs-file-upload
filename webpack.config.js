@@ -12,7 +12,7 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.js$/,
-      loaders: 'babel-loader'
+      loaders: ['react-hot-loader','babel-loader']
     }, { test: /\.json$/, loader: 'json-loader' }]
   },
   node: {

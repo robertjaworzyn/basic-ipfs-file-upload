@@ -1,34 +1,29 @@
 'use strict'
-const React = require('react')
-const ipfsAPI = require('ipfs-api')
+import React from 'react';
+import ipfsAPI from 'ipfs-api';
 
 class App extends React.Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props);
     this.state = {
       added_file_hash: null
-    }
-    this.ipfsApi = ipfsAPI('localhost', '5001')
-
-    // bind methods
-    this.captureFile = this.captureFile.bind(this)
-    this.saveToIpfs = this.saveToIpfs.bind(this)
-    this.arrayBufferToString = this.arrayBufferToString.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
+    };
+    this.ipfsApi = ipfsAPI('localhost', '5001');
   }
 
-  captureFile (event) {
-    event.stopPropagation()
-    event.preventDefault()
-    const file = event.target.files[0]
-    let reader = new window.FileReader()
-    reader.onloadend = () => this.saveToIpfs(reader)
-    reader.readAsArrayBuffer(file)
+  captureFile = (file) => {
+    // event.stopPropagation();
+    // event.preventDefault();
+    // const file = event.target.files[0];
+    //console.log(formData);
+    let reader = new window.FileReader();
+    reader.onloadend = () => this.saveToIpfs(reader);
+    reader.readAsArrayBuffer(file);
   }
 
-  saveToIpfs (reader) {
-    let ipfsId
-    const buffer = Buffer.from(reader.result)
+  saveToIpfs = (reader) => {
+    let ipfsId;
+    const buffer = Buffer.from(reader.result);
     this.ipfsApi.add(buffer)
     .then((response) => {
       console.log(response)
@@ -40,19 +35,32 @@ class App extends React.Component {
     })
   }
 
-  arrayBufferToString (arrayBuffer) {
-    return String.fromCharCode.apply(null, new Uint16Array(arrayBuffer))
-  }
+  // arrayBufferToString = (arrayBuffer) => {
+  //   return String.fromCharCode.apply(null, new Uint16Array(arrayBuffer))
+  // }
 
-  handleSubmit (event) {
-    event.preventDefault()
+  handleSubmit = (event) => {
+    event.preventDefault();
+    const files = this.filesInput.files;
+    this.captureFile(files[0]);
+
   }
 
   render () {
     return (
       <div>
+        <h1>Hey buddy, upload ya file would ya?!?!</h1>
         <form id="captureMedia" onSubmit={this.handleSubmit}>
-          <input type="file" onChange={this.captureFile} />
+          <input
+            type="file"
+            ref={(input) => { this.filesInput = input; }}
+            name = "file"
+            required />
+          <br/>
+          <textarea ref = "description"
+            label ="Description: " placeholder = "Describe yo file.." required/>
+          <br/>
+          <button type = "submit">SUBMIT</button>
         </form>
         <div>
           <a target="_blank"
@@ -64,4 +72,5 @@ class App extends React.Component {
     )
   }
 }
-module.exports = App
+
+export default App;
