@@ -1,6 +1,7 @@
 body{
   background: #eee;
   margin: 20px;
+  font-family: 'Roboto', sans-serif;
 }
 
 textarea:required:invalid {
@@ -18,17 +19,6 @@ input:require {
   border-radius: 2px;
   box-shadow: 1px 3px 5px rgba(0,0,0,0.2);
   color:#333;
-}
-
-.butt {
-   background-color: grey;
-   color: white;
-   padding: 4px 12px;
-}
-
-.butt:hover {
-   background-color: lightgrey;
-   color:white;
 }
 
 #todo-wrapper p{

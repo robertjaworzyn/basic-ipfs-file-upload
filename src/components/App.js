@@ -1,14 +1,19 @@
 'use strict'
 import React from 'react';
 import ipfsAPI from 'ipfs-api';
+// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+// import RaisedButton from 'material-ui/RaisedButton';
+// import FileCloudUpload from 'material-ui/svg-icons/file/cloud-upload';
+import {Button} from 'react-bootstrap'
 
+import * as api from '../api';
 require("./css/index.css")
 
 class App extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      added_file_hash: null
+      fileHashes: []
     };
     this.ipfsApi = ipfsAPI('localhost', '5001');
   }
@@ -18,10 +23,11 @@ class App extends React.Component {
     const buffer = Buffer.from(reader.result);
     this.ipfsApi.add(buffer)
     .then((response) => {
-      console.log(response)
-      ipfsId = response[0].hash
-      console.log(ipfsId)
-      this.setState({added_file_hash: ipfsId})
+      const hashes = this.state.fileHashes;
+      hashes.push(response[0].hash);
+      this.setState({
+        fileHashes: hashes
+      });
     }).catch((err) => {
       console.error(err)
     })
@@ -42,31 +48,42 @@ class App extends React.Component {
   }
 
   render () {
+    var hashList = this.state.fileHashes;
+    if (hashList) {
+      hashList = hashList.map((hash, index) => {
+        return (
+          <li><a target="_blank"
+            href={'https://ipfs.io/ipfs/' + hash}>
+            {hash}
+          </a>
+          </li>
+        );
+      })
+    }
     return (
       <div id = "wrapper">
         <h1>Hey buddy, upload ya file would ya?!?!</h1>
-        <br/><br/>
+        <br/>
         <form id="captureMedia" onSubmit={this.handleSubmit}>
           <input
             type="file"
             ref={(input) => { this.filesInput = input; }}
             className = "file"
             required />
-          <br/>
+          <br/><br/>
           <textarea ref = "description"
             label ="Description: " placeholder = "Describe yo file.."
             rows = "5" cols = "50" required/>
           <br/><br/>
-          <button className = "butt" type = "submit">SUBMIT</button>
+          <Button bsStyle="primary" type = "submit"> SUBMIT</Button>
         </form>
         <div>
-          <a target="_blank"
-            href={'https://ipfs.io/ipfs/' + this.state.added_file_hash}>
-            {this.state.added_file_hash}
-          </a>
+        <ul>
+          {hashList}
+        </ul>
         </div>
       </div>
-    )
+    );
   }
 }
 
