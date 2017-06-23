@@ -13,7 +13,15 @@ module.exports = {
     loaders: [{
       test: /\.js$/,
       loaders: ['react-hot-loader','babel-loader']
-    }, { test: /\.json$/, loader: 'json-loader' }]
+    },
+    {
+        test: /\.json$/,
+        loader: 'json-loader'
+    },
+    {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader'
+    }]
   },
   node: {
     fs: 'empty',

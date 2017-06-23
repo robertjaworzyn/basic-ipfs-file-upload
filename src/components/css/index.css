@@ -1,0 +1,37 @@
+body{
+  background: #eee;
+  margin: 20px;
+}
+
+textarea:required:invalid {
+    box-shadow:none;
+}
+input:require {
+  box-shadow:none;
+}
+
+#wrapper{
+  width: 80%;
+  margin: 0 auto;
+  background: #fff;
+  padding: 10px;
+  border-radius: 2px;
+  box-shadow: 1px 3px 5px rgba(0,0,0,0.2);
+  color:#333;
+}
+
+.butt {
+   background-color: grey;
+   color: white;
+   padding: 4px 12px;
+}
+
+.butt:hover {
+   background-color: lightgrey;
+   color:white;
+}
+
+#todo-wrapper p{
+  color:#777;
+  font-style: italic;
+}

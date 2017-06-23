@@ -2,6 +2,8 @@
 import React from 'react';
 import ipfsAPI from 'ipfs-api';
 
+require("./css/index.css")
+
 class App extends React.Component {
   constructor (props) {
     super(props);
@@ -9,16 +11,6 @@ class App extends React.Component {
       added_file_hash: null
     };
     this.ipfsApi = ipfsAPI('localhost', '5001');
-  }
-
-  captureFile = (file) => {
-    // event.stopPropagation();
-    // event.preventDefault();
-    // const file = event.target.files[0];
-    //console.log(formData);
-    let reader = new window.FileReader();
-    reader.onloadend = () => this.saveToIpfs(reader);
-    reader.readAsArrayBuffer(file);
   }
 
   saveToIpfs = (reader) => {
@@ -42,25 +34,30 @@ class App extends React.Component {
   handleSubmit = (event) => {
     event.preventDefault();
     const files = this.filesInput.files;
-    this.captureFile(files[0]);
+    let reader = new window.FileReader();
+    reader.onloadend = () => this.saveToIpfs(reader);
+    reader.readAsArrayBuffer(files[0]);
+    this.refs.description.value = "";
 
   }
 
   render () {
     return (
-      <div>
+      <div id = "wrapper">
         <h1>Hey buddy, upload ya file would ya?!?!</h1>
+        <br/><br/>
         <form id="captureMedia" onSubmit={this.handleSubmit}>
           <input
             type="file"
             ref={(input) => { this.filesInput = input; }}
-            name = "file"
+            className = "file"
             required />
           <br/>
           <textarea ref = "description"
-            label ="Description: " placeholder = "Describe yo file.." required/>
-          <br/>
-          <button type = "submit">SUBMIT</button>
+            label ="Description: " placeholder = "Describe yo file.."
+            rows = "5" cols = "50" required/>
+          <br/><br/>
+          <button className = "butt" type = "submit">SUBMIT</button>
         </form>
         <div>
           <a target="_blank"
