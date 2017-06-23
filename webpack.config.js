@@ -12,10 +12,7 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.js$/,
-      loaders: 'babel-loader',
-      query: {
-        "presets": ["react", "es2015", "stage-2"]
-      }
+      loaders: 'babel-loader'
     }, { test: /\.json$/, loader: 'json-loader' }]
   },
   node: {

@@ -1,7 +1,7 @@
-var config = require('./config');
+import config from './config';
 //import apiRouter from './api';
-var bodyParser = require('body-parser');
-var express = require('express');
+import bodyParser from 'body-parser';
+import express from 'express';
 const server = express();
 
 server.use(bodyParser.json());
