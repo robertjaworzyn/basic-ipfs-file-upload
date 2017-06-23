@@ -9,14 +9,13 @@ module.exports = {
     path: __dirname + '/public',
     filename: 'bundle.js'
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
   module: {
     loaders: [{
       test: /\.js$/,
-      loaders: ['react-hot', 'babel'],
-      include: path.join(__dirname, 'src')
+      loaders: 'babel-loader',
+      query: {
+        "presets": ["react", "es2015", "stage-2"]
+      }
     }, { test: /\.json$/, loader: 'json-loader' }]
   },
   node: {
