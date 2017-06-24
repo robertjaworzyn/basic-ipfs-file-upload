@@ -3,6 +3,7 @@ import React from 'react';
 import ipfsAPI from 'ipfs-api';
 import {Button} from 'react-bootstrap'
 
+import FileList from './fileList';
 import * as api from '../api';
 require("./css/index.css")
 
@@ -62,18 +63,6 @@ class App extends React.Component {
   }
 
   render () {
-    var hashList = this.state.fileData;
-    if (hashList) {
-      hashList = hashList.map((file, index) => {
-        return (
-          <li><a target="_blank"
-            href={'https://ipfs.io/ipfs/' + file.hash}>
-            {file.name}
-          </a>
-          </li>
-        );
-      })
-    }
     return (
       <div id = "wrapper">
         <h1>Hey buddy, upload ya file would ya?!?!</h1>
@@ -91,10 +80,10 @@ class App extends React.Component {
           <br/><br/>
           <Button bsStyle="primary" type = "submit"> SUBMIT</Button>
         </form>
+        <br/>
+        <h2>Here are your files: </h2><br/>
         <div>
-        <ul>
-          {hashList}
-        </ul>
+          <FileList files = {this.state.fileData} />
         </div>
       </div>
     );
