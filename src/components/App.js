@@ -1,9 +1,6 @@
 'use strict'
 import React from 'react';
 import ipfsAPI from 'ipfs-api';
-// import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-// import RaisedButton from 'material-ui/RaisedButton';
-// import FileCloudUpload from 'material-ui/svg-icons/file/cloud-upload';
 import {Button} from 'react-bootstrap'
 
 import * as api from '../api';
@@ -13,48 +10,65 @@ class App extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      fileHashes: []
+      fileData: []
     };
     this.ipfsApi = ipfsAPI('localhost', '5001');
   }
 
-  saveToIpfs = (reader) => {
+  componentDidMount = () => {
+    this.fetchFiles();
+  }
+
+  fetchFiles = () => {
+    api.fetchFiles().then(newFiles => {
+      this.setState({
+        fileData: newFiles
+      })
+    })
+  }
+
+  saveToIpfs = (reader, name, desc) => {
     let ipfsId;
     const buffer = Buffer.from(reader.result);
     this.ipfsApi.add(buffer)
     .then((response) => {
-      const hashes = this.state.fileHashes;
-      hashes.push(response[0].hash);
+      const hashes = this.state.fileData;
+      api.saveFile(name, response[0].hash, desc)
+        .then(resp => console.log(resp));
+      hashes.push({
+        name: name,
+        hash: response[0].hash,
+        desc: desc
+      });
       this.setState({
-        fileHashes: hashes
+        fileData: hashes
       });
     }).catch((err) => {
       console.error(err)
     })
   }
 
-  // arrayBufferToString = (arrayBuffer) => {
-  //   return String.fromCharCode.apply(null, new Uint16Array(arrayBuffer))
-  // }
-
   handleSubmit = (event) => {
     event.preventDefault();
     const files = this.filesInput.files;
+    const name = files[0].name;
+    const desc = this.refs.description.value;
     let reader = new window.FileReader();
-    reader.onloadend = () => this.saveToIpfs(reader);
+    reader.onloadend = () =>
+        this.saveToIpfs(reader, name, desc);
     reader.readAsArrayBuffer(files[0]);
     this.refs.description.value = "";
 
   }
 
   render () {
-    var hashList = this.state.fileHashes;
+    var hashList = this.state.fileData;
     if (hashList) {
-      hashList = hashList.map((hash, index) => {
+      hashList = hashList.map((file, index) => {
         return (
           <li><a target="_blank"
-            href={'https://ipfs.io/ipfs/' + hash}>
-            {hash}
+            href={'https://ipfs.io/ipfs/' + file.hash}>
+            {file.name}
           </a>
           </li>
         );
