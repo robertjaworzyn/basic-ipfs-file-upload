@@ -1,45 +1,32 @@
 import express from 'express';
-import { MongoClient, ObjectID } from 'mongodb';
 import assert from 'assert';
+import mongoose from 'mongoose';
+
+import FileModel from '../models/fileData';
 import config from '../config';
-//import ipfsAPI from 'ipfs-api';
 
-//initialise mongo
-let mdb;
-MongoClient.connect(config.mongodbUri, (err, db) => {
-  assert.equal(null, err);
+mongoose.connect(config.mongodbUri);
+var mdb = mongoose.connection;
 
-  mdb = db;
-});
-
-//const ipfsApi = ipfsAPI('localhost', '5001');
+//Bind connection to error event (to get notification of connection errors)
+mdb.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 const router = express.Router();
 
 router.get('/files', (req, res) => {
-  let files = [];
-  mdb.collection('fileData').find({})
-    .each((err, file) => {
-      assert.equal(null,err);
-      if (!file) {
-        res.send({files});
-        return;
-      }
-      files.push(file);
-
-    })
+  FileModel.find({}, (err, results) => {
+    if (err) console.error(err);
+    res.send({results});
+  })
 })
 
 
 router.post('/saveFile', (req, res) => {
-  const name = req.body.name;
-  const hash = req.body.hash;
-  const desc = req.body.desc;
-  mdb.collection('fileData').insertOne({name, hash, desc})
-    .then(result => {
-      assert.equal(1,result.insertedCount);
-      res.send(result.insertedId);
-    })
+
+  FileModel.create({...req.body}, (err,result) => {
+    if (err) console.error(err);
+    res.send(result._id);
+  });
 
 })
 

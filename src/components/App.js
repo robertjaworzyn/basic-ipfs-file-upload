@@ -26,6 +26,7 @@ class App extends React.Component {
 
   componentDidMount = () => {
     this.fetchFiles();
+    console.log(this.state.fileData);
     this.getAccount();
   }
 

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const fetchFiles = () => {
   return axios.get(`api/files`)
-              .then(resp => resp.data.files)
+              .then(resp => resp.data.results)
 }
 
 

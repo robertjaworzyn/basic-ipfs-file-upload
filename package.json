@@ -36,6 +36,7 @@
     "express": "^4.15.3",
     "material-ui": "^0.18.3",
     "mongodb": "^2.2.29",
+    "mongoose": "^4.11.0",
     "react-bootstrap": "^0.31.0",
     "web3": "^0.19.1"
   }
