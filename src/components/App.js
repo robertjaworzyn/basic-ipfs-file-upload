@@ -3,7 +3,7 @@ import React from 'react';
 import ipfsAPI from 'ipfs-api';
 import {Button} from 'react-bootstrap'
 
-import MetaCoin from '../../contracts/MetaCoin.sol';
+import Storage from '../../contracts/Storage.sol';
 import FileList from './fileList';
 import * as api from '../api';
 require("./css/index.css")
@@ -11,31 +11,22 @@ require("./css/index.css")
 class App extends React.Component {
   constructor (props) {
     super(props);
-
     this.state = {
       fileData: [],
       accounts: [],
+      account: '',
       coinbase: ''
     };
     this.ipfsApi = ipfsAPI('localhost', '5001');
   }
 
   componentWillMount = () => {
-    MetaCoin.setProvider(this.props.web3.currentProvider);
+    Storage.setProvider(this.props.web3.currentProvider);
   }
 
   componentDidMount = () => {
     this.fetchFiles();
-    const refreshBalances = () => {
-      this._getAccountBalances();
-    }
-
-    refreshBalances();
-
-    // setInterval(()=>{
-    //   refreshBalances();
-    //   return refreshBalances
-    // }, 5000)
+    this.getAccount();
   }
 
   fetchFiles = () => {
@@ -46,7 +37,7 @@ class App extends React.Component {
     })
   }
 
-  saveToIpfs = (reader, name, desc) => {
+  saveToIpfs = (reader, name, desc, account) => {
     let ipfsId;
     const buffer = Buffer.from(reader.result);
     this.ipfsApi.add(buffer)
@@ -62,47 +53,36 @@ class App extends React.Component {
       this.setState({
         fileData: hashes
       });
+
+      console.log("Yo, this is the account we sending from: " + this.state.account);
+      var store = Storage.deployed();
+      store.set(response[0].hash, {from: this.state.account}).then((result) => {
+        console.log('Successfully sent data. Transaction hash: ', result);
+      })
     }).catch((err) => {
       console.error(err)
     })
   }
 
-  _getAccountBalance = (account) => {
-   var meta = MetaCoin.deployed();
-   return new Promise((resolve, reject) => {
-     meta.getBalance.call(account, {from: account}).then((value) => {
-       resolve({ account: value.valueOf() })
-     }).catch((e) => {
-       console.log(e);
-       reject();
-     })
-   })
- }
+  getAccount = () => {
+    var acc;
+    this.props.web3.eth.getAccounts((err, accs) => {
+      console.log(accs);
+      if (err != null) {
+        window.alert('There was an error fetching your accounts.');
+        console.error(err);
+        return;
+      }
 
-  _getAccountBalances = () => {
-     this.props.web3.eth.getAccounts((err, accs) => {
-       if (err != null) {
-         window.alert('There was an error fetching your accounts.');
-         console.error(err);
-         return;
-       }
+      if (accs.length === 0) {
+        window.alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
+        return;
+      }
+      this.setState({
+        account: accs[0]
+      })
 
-       if (accs.length === 0) {
-         window.alert("Couldn't get any accounts! Make sure your Ethereum client is configured correctly.");
-         return;
-       }
-
-       this.setState({coinbase: accs[0]});
-
-       var accountsAndBalances = accs.map((account) => {
-         return this._getAccountBalance(account).then((balance) => { return { account, balance } });
-       })
-
-       Promise.all(accountsAndBalances).then((accountsAndBalances) => {
-         this.setState({accounts: accountsAndBalances, coinbase: accountsAndBalances[0]})
-       });
-     });
-
+    });
   }
 
   handleSubmit = (event) => {
@@ -115,7 +95,6 @@ class App extends React.Component {
         this.saveToIpfs(reader, name, desc);
     reader.readAsArrayBuffer(files[0]);
     this.refs.description.value = "";
-
   }
 
   render () {
